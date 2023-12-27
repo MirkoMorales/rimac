@@ -17,6 +17,7 @@ const fieldIndexTranslations = {
   'starships' : 'nave_estelar',
   'created' : 'creado',
   'edited' : 'editado',
+  'url' : 'url'
  };
 
  const valueTranslations = {
@@ -26,9 +27,13 @@ const fieldIndexTranslations = {
   'white': 'blanco',
   'brown': 'marron',
   'blue': 'azul',
+  'grey': 'gris',
+  'gold': 'oro',
   'unknown': 'desconocido',
   'female': 'femenino',
-  'male': 'masculino'
+  'male': 'masculino',
+  'pale': 'palido',
+  'light': 'ligero'
  };
 
  const combinedTranslations = Object.assign({}, fieldIndexTranslations, valueTranslations);
@@ -67,17 +72,11 @@ fetchAllPeople().then(people => {
   const translatedPeople = people.map(person => {
   let translatedPerson = {};
   for (let index in person) {
-  if (combinedTranslations[index]) {
-   translatedPerson[combinedTranslations[index]] = person[index];
-  } else {
-   translatedPerson[index] = person[index];
-  }
-
-  if (combinedTranslations[person[index]]) {
-    translatedPerson[index] = combinedTranslations[person[index]];
-   } else {
-    translatedPerson[index] = person[index];
-   }
+    if (combinedTranslations[person[index]]) {
+      translatedPerson[index] = combinedTranslations[person[index]];
+    } else if (combinedTranslations[index]) {
+      translatedPerson[combinedTranslations[index]] = person[index];
+    }
 
   }
   return translatedPerson;
