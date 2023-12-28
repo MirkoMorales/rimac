@@ -22,6 +22,7 @@ const fieldIndexTranslations = {
 
  const valueTranslations = {
   'blond': 'rubio',
+  'blonde': 'rubio',
   'none': 'ninguno',
   'black': 'negro',
   'white': 'blanco',
@@ -29,55 +30,48 @@ const fieldIndexTranslations = {
   'blue': 'azul',
   'grey': 'gris',
   'gold': 'oro',
+  'yellow' : 'amarillo',
+  'fair' : 'blanca',
+  'red' : 'rojo',
+  'green' : 'verde',
+  'silver' : 'plateado',
   'unknown': 'desconocido',
   'female': 'femenino',
   'male': 'masculino',
   'pale': 'palido',
-  'light': 'ligero'
+  'light': 'ligero',
+  'tan': 'bronceado'
  };
 
- const combinedTranslations = Object.assign({}, fieldIndexTranslations, valueTranslations);
-
- async function fetchAllPeople(url = 'https://swapi.dev/api/people/') {
+async function fetchAllPeople(url = 'https://swapi.dev/api/people/') {
  try {
- const response = await axios.get(url);
- const people = response.data.results;
- if (response.data.next) {
-  return people.concat(await fetchAllPeople(response.data.next));
- } else {
-  return people;
- }
+  const response = await axios.get(url);
+  const people = response.data.results;
+  if (response.data.next) {
+    return people.concat(await fetchAllPeople(response.data.next));
+  } else {
+    return people;
+  }
  } catch (error) {
- console.error(`Error al obtener personas: ${error}`);
+  console.error(`Error al obtener personas: ${error}`);
  }
 }
-/*
+
 fetchAllPeople().then(people => {
   const translatedPeople = people.map(person => {
   let translatedPerson = {};
   for (let index in person) {
-    if (valueTranslations[person[index]]) {
-      translatedPerson[index] = valueTranslations[person[index]];
-    } else if (fieldIndexTranslations[index]) {
-      translatedPerson[fieldIndexTranslations[index]] = person[index];
-    }
-   //translatedPerson[fieldIndexTranslations[index]] = person[index];
-  }
-  return translatedPerson;
+  let translatedIndex = fieldIndexTranslations[index] || index;
+  let translatedValue;
+  if (typeof person[index] === 'string') {
+  let values = person[index].split(',').map(value => {
+  return valueTranslations[value.trim()] || value.trim();
   });
-  console.log(translatedPeople);
- });
-*/
- fetchAllPeople().then(people => {
-  const translatedPeople = people.map(person => {
-  let translatedPerson = {};
-  for (let index in person) {
-    if (combinedTranslations[person[index]]) {
-      translatedPerson[index] = combinedTranslations[person[index]];
-    } else if (combinedTranslations[index]) {
-      translatedPerson[combinedTranslations[index]] = person[index];
-    }
-
+  translatedValue = values.join(', ');
+  } else {
+  translatedValue = person[index];
+  }
+  translatedPerson[translatedIndex] = translatedValue;
   }
   return translatedPerson;
   });
@@ -86,19 +80,18 @@ fetchAllPeople().then(people => {
 
 /*
 fetchAllPeople().then(people => {
- console.log(people);
+  const translatedPeople = people.map(person => {
+  let translatedPerson = {};
+  for (let index in person) {
+      let translatedIndex = fieldIndexTranslations[index] || index;
+      let translatedValue = valueTranslations[person[index]] || person[index];
+      translatedPerson[translatedIndex] = translatedValue;
+  }
+  return translatedPerson;
+  });
+  console.log(translatedPeople);
 });
-
-async function getAllPeople() {
-  try {
-     const response = await axios.get('https://swapi.dev/api/people/');
-     return response.data.results;
-  } catch (error) {
-     console.error('Error al obtener los personajes:', error);
-  }
- }
 */
-
 module.exports.hello = async (event) => {
   return {
     statusCode: 200,
