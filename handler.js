@@ -45,38 +45,38 @@ const fieldIndexTranslations = {
 
 async function fetchAllPeople(url = 'https://swapi.dev/api/people/') {
  try {
-  const response = await axios.get(url);
-  const people = response.data.results;
-  if (response.data.next) {
-    return people.concat(await fetchAllPeople(response.data.next));
-  } else {
-    return people;
-  }
+    const response = await axios.get(url);
+    const people = response.data.results;
+    if (response.data.next) {
+      return people.concat(await fetchAllPeople(response.data.next));
+    } else {
+      return people;
+    }
  } catch (error) {
-  console.error(`Error al obtener personas: ${error}`);
+    console.error(`Error al obtener personas: ${error}`);
  }
 }
 
 fetchAllPeople().then(people => {
   const translatedPeople = people.map(person => {
-  let translatedPerson = {};
-  for (let index in person) {
-  let translatedIndex = fieldIndexTranslations[index] || index;
-  let translatedValue;
-  if (typeof person[index] === 'string') {
-  let values = person[index].split(',').map(value => {
-  return valueTranslations[value.trim()] || value.trim();
-  });
-  translatedValue = values.join(', ');
-  } else {
-  translatedValue = person[index];
-  }
-  translatedPerson[translatedIndex] = translatedValue;
-  }
-  return translatedPerson;
+    let translatedPerson = {};
+    for (let index in person) {
+      let translatedIndex = fieldIndexTranslations[index] || index;
+      let translatedValue;
+      if (typeof person[index] === 'string') {
+          let values = person[index].split(',').map(value => {
+            return valueTranslations[value.trim()] || value.trim();
+          });
+          translatedValue = values.join(', ');
+      } else {
+        translatedValue = person[index];
+      }
+      translatedPerson[translatedIndex] = translatedValue;
+    }
+    return translatedPerson;
   });
   console.log(translatedPeople);
- });
+});
 
 /*
 fetchAllPeople().then(people => {
@@ -119,6 +119,33 @@ module.exports.helloUser = async (event) => {
     ),
   };
 };
+
+exports.TraslatePerson = async (event) => {
+  try {
+     const people = await fetchAllPeople();
+     return {
+       statusCode: 200,
+       headers: {
+         "Access-Control-Allow-Origin": "*",
+         "Access-Control-Allow-Methods": 'GET',
+         "Content-Type": "application/json"
+       },
+       body: JSON.stringify(people)
+     };
+  } catch (error) {
+     console.error(`Error al obtener personas: ${error}`);
+     return {
+       statusCode: 500,
+       headers: {
+         "Access-Control-Allow-Origin": "*",
+         "Access-Control-Allow-Methods": 'GET',
+         "Content-Type": "application/json"
+       },
+       body: JSON.stringify({ error: 'Error al obtener personas' })
+     };
+  }
+ };
+
 
 /*
 (async () => {

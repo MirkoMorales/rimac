@@ -71,3 +71,10 @@ functions:
       - http:
           method: GET
           path: /user
+  
+  TraslatePerson:
+    handler: handler.TraslatePerson
+    events:
+      - http:
+          method: GET
+          path: /personas
